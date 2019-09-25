@@ -5,6 +5,7 @@ TODO: - Add sample breakpoints
 */
 
 s.boot;
+s.options.device = "Soundflower (64ch)"
 
 ~buf = Buffer.read(s, "piano.wav");
 
@@ -34,3 +35,4 @@ r = Routine.new({
 r.play;
 r.stop;
 
+s.meter;
