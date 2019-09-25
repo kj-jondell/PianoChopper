@@ -6,7 +6,7 @@ TODO: - Add sample breakpoints
 
 s.boot;
 
-~buf1 = Buffer.read(s, "piano.wav");
+~buf = Buffer.read(s, "piano.wav");
 
 (
 SynthDef.new(\bufPlay, {|buf, rate, t_trig, lag = 0.1, start = 0|
@@ -16,7 +16,7 @@ SynthDef.new(\bufPlay, {|buf, rate, t_trig, lag = 0.1, start = 0|
 }).add;
 )
 
-x = Synth.new(\bufPlay, [\buf, ~buf1, \rate, 1]);
+x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1]);
 a = Pwhite.new(0.25, 1,  length: inf).asStream;
 a.next;
 x.set(\rate, a.next, \start, 48000*(30.rand()+1), \t_trig, 1)
