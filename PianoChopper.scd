@@ -1,4 +1,4 @@
-/*
+/**
 Program for chopping up piano
 TODO: - Add sample breakpoints
 - Re-record piano sample
@@ -10,7 +10,7 @@ s.options.device = "Soundflower (64ch)"
 ~breakpoints = [0,70716, 148109, 334383, 522706, 729012, 839790, 1021891, 1226148, 1456809, 1891424] ; //slightly off as i modified sample
 (size(~breakpoints)-1).rand()
 
-
+//EQ on piano samples...???
 ~buf = Buffer.read(s, "piano.wav");
 ~buf = Buffer.read(s, "piano2.wav");
 ~buf = Buffer.read(s, "piano3.wav");
