@@ -11,9 +11,9 @@ s.options.device = "Soundflower (64ch)"
 (size(~breakpoints)-1).rand()
 
 //EQ on piano samples...???
-~buf = Buffer.read(s, "piano.wav");
-~buf = Buffer.read(s, "piano2.wav");
-~buf = Buffer.read(s, "piano3.wav");
+~buf = Buffer.read(s, "samples/piano.wav");
+~buf = Buffer.read(s, "samples/piano2.wav");
+~buf = Buffer.read(s, "samples/piano3.wav");
 
 (
 SynthDef.new(\bufPlay, {|buf, rate, t_trig, lag = 0.05, start = 0|
