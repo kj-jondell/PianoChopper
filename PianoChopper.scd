@@ -4,7 +4,7 @@ TODO: - Add sample breakpoints
 - Re-record piano sample
 */
 
-s.reboot;
+s.boot;
 s.options.device = "Soundflower (64ch)"
 
 ~breakpoints = [0,70716, 148109, 334383, 522706, 729012, 839790, 1021891, 1226148, 1456809, 1891424] ; //slightly off as i modified sample
@@ -34,7 +34,8 @@ SynthDef.new(\RingMod, {
 x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1]);
 //TODO: modify a? range lo-high increases with duration of song...
 a = Pwhite.new(0.35, 0.8,  length: inf).asStream;
-a.next;
+a = Pgauss.new(mean: 0.6,  dev: 0.15,  length: inf).asStream;
+a.next
 x.set(\rate, a.next, \start, 48000*(30.rand()+1), \t_trig, 1)
 x.free;
 
