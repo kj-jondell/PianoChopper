@@ -4,13 +4,15 @@ TODO: - Add sample breakpoints
 - Re-record piano sample
 */
 
-s.reboot;
+s.boot;
 s.options.device = "Soundflower (64ch)"
 
 (size(~breakpoints)-1).rand()
 
 //EQ on piano samples...???
 ~buf = Buffer.read(s, "samples/piano.wav");
+~buf = Buffer.read(s, "samples/piano4.wav");
+~buf = Buffer.read(s, "samples/piano5.wav");
 
 (
     ~buf = Buffer.read(s, "samples/piano2.wav");
@@ -61,4 +63,9 @@ r = Routine.new({
 r.play;
 r.stop;
 
+s.boot
 s.meter;
+
+b = PStepper.new([1,2,3,4], 5).asStream;
+b.next
+
