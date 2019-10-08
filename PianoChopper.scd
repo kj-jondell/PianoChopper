@@ -5,6 +5,7 @@ TODO: - Add sample breakpoints
 */
 
 s.boot;
+s.quit;
 s.options.device = "Soundflower (64ch)"
 
 (size(~breakpoints)-1).rand()
@@ -43,22 +44,25 @@ SynthDef.new(\RingMod, {
 x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1]);
 //TODO: modify a? range lo-high increases with duration of song...
 a = Pwhite.new(0.35, 0.8,  length: inf).asStream;
+b = Pstepper.new(size:(size(~breakpoints)-1)).asStream;
+b.next;
+b.reset;
 a = Pgauss.new(mean: 1,  dev: 0.25,  length: inf).asStream;
 a.next
-x.set(\rate, a.next, \start, 48000*(30.rand()+1), \t_trig, 1)
-x.free;
 
 (
 r = Routine.new({
     loop{
-        var dur, index = (size(~breakpoints)-1).rand(), speed;
+        var dur, speed, index;
         speed = a.next;
+        index = b.next;
         dur = (1/speed)*(~breakpoints[index+1] - ~breakpoints[index])/48000;
         x.set(\buf, ~buf, \rate, speed, \start, ~breakpoints[index], \t_trig, 1);
         dur.yield;
     }   
 });
 )
+b.postln;
 
 r.play;
 r.stop;
@@ -66,6 +70,7 @@ r.stop;
 s.boot
 s.meter;
 
-b = PStepper.new([1,2,3,4], 5).asStream;
+b = Pstepper.new(length:5).asStream;
 b.next
+b.reset
 
