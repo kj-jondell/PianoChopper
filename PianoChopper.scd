@@ -43,8 +43,8 @@ SynthDef.new(\RingMod, {
 
 x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1]);
 //TODO: modify a? range lo-high increases with duration of song...
-a = Pwhite.new(0.35, 0.8,  length: inf).asStream;
-b = Pstepper.new(size:(size(~breakpoints)-1)).asStream;
+a = Pwhite.new(0.35,0.8,  length: inf).asStream;
+b = Pstepper.new(size:(size(~breakpoints)-1), repeats: 1).asStream;
 b.next;
 b.reset;
 a = Pgauss.new(mean: 1,  dev: 0.25,  length: inf).asStream;
@@ -55,7 +55,7 @@ r = Routine.new({
     loop{
         var dur, speed, index;
         speed = a.next;
-        index = b.next;
+        index = b.next ? (size(~breakpoints)-2);
         dur = (1/speed)*(~breakpoints[index+1] - ~breakpoints[index])/48000;
         x.set(\buf, ~buf, \rate, speed, \start, ~breakpoints[index], \t_trig, 1);
         dur.yield;
