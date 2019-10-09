@@ -26,25 +26,30 @@ s.options.device = "Soundflower (64ch)"
 )
 
 (
-SynthDef.new(\bufPlay, {|buf, rate, t_trig, lag = 0.05, start = 0|
+SynthDef.new(\bufPlay, {
+    arg buf, rate, t_trig, lag = 0.05, start = 0, out = 0;
 	var sig, envsig;
 	sig = PlayBufCF.ar(1, buf, BufRateScale.kr(buf)*rate, t_trig, start, lag: lag); //PlayBufCF for crossfading when jumping in buffer
-	Out.ar(0,sig!2);
+	Out.ar(out, sig!2);
 }).add;
 )
 
-//TODO: add ringmodulation with xfade
+//TODO: stereo/multichannel fx, with different AM-freq per speaker!
 (
 SynthDef.new(\RingMod, {
-
-
+    arg in = 3;
+    var signal = In.ar(in, 1), mod_signal, out_signal;
+    mod_signal = signal*[SinOsc.ar(440), SinOsc.ar(432)];
+    out_signal = XFade2.ar(signal!2, mod_signal, SinOsc.kr(0.05,mul:2,add:-1),  level: 1.0);
+    Out.ar(0, out_signal); 
 }).add;
 )
 
-x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1]);
+x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1, \out, 3]);
+y = Synth.after(x, \RingMod, [\in, 3]);
 //TODO: modify a? range lo-high increases with duration of song...
-a = Pwhite.new(0.35,0.8,  length: inf).asStream;
-b = Pstepper.new(size:(size(~breakpoints)-1), repeats: 1).asStream;
+a = Pwhite.new(0.4,0.9,  length: inf).asStream;
+b = Pstepper.new(size:(size(~breakpoints)-1), repeats: inf).asStream;
 b.next;
 b.reset;
 a = Pgauss.new(mean: 1,  dev: 0.25,  length: inf).asStream;
