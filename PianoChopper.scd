@@ -8,6 +8,7 @@ s.boot;
 s.quit;
 s.options.device = "Soundflower (64ch)"
 
+
 (size(~breakpoints)-1).rand()
 
 //EQ on piano samples...???
@@ -39,14 +40,14 @@ SynthDef.new(\bufPlay, {
 SynthDef.new(\RingMod, {
     arg in = 3;
     var signal = In.ar(in, 1), mod_signal, out_signal;
-    mod_signal = signal*[SinOsc.ar(440), SinOsc.ar(432)];
-    out_signal = XFade2.ar(signal!2, mod_signal, SinOsc.kr(0.05,mul:2,add:-1),  level: 1.0);
+    mod_signal = signal*[SinOsc.ar(70.midicps),SinOsc.ar(74.midicps),SinOsc.ar(77.midicps),SinOsc.ar(70.midicps),SinOsc.ar(74.midicps),SinOsc.ar(77.midicps),SinOsc.ar(70.midicps),SinOsc.ar(74.midicps),SinOsc.ar(77.midicps)]*0.5;
+    out_signal = XFade2.ar(signal!2, mod_signal, SinOsc.kr(0.05), level: 1.0); //change modulation to parameter instead
     Out.ar(0, out_signal); 
 }).add;
 )
 
-x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1, \out, 3]);
-y = Synth.after(x, \RingMod, [\in, 3]);
+x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1, \out, 11]);
+y = Synth.after(x, \RingMod, [\in, 11]);
 //TODO: modify a? range lo-high increases with duration of song...
 a = Pwhite.new(0.4,0.9,  length: inf).asStream;
 b = Pstepper.new(size:(size(~breakpoints)-1), repeats: inf).asStream;
