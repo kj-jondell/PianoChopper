@@ -1,36 +1,21 @@
 /**
 Program for chopping up piano
 TODO: - Add sample breakpoints
-- Re-record piano sample
+- Waltz change speed (but no jump), through Soundflower
+- Play using Disklavier
 */
 
-s.boot;
+
+s.reboot;
 s.quit;
 s.options.device = "Soundflower (64ch)"
-
-
-(size(~breakpoints)-1).rand()
-
 //EQ on piano samples...???
-~buf = Buffer.read(s, "samples/piano.wav");
-~buf = Buffer.read(s, "samples/piano4.wav");
-~buf = Buffer.read(s, "samples/piano5.wav");
-~buf = Buffer.read(s, "samples/piano6.wav");
-~buf = Buffer.read(s, "samples/orgel.wav");
+~buf2 = Buffer.read(s, "samples/piano9.wav");
 
 (
     ~buf = Buffer.read(s, "samples/piano8.wav");
-    ~breakpoints = [0,327635,440035,617005,786802,988883];
-)
-
-(
-    ~buf = Buffer.read(s, "samples/piano2.wav");
-    ~breakpoints = [48000*3.5, 48000*5]; //placeholder values
-)
-
-(
-    ~buf = Buffer.read(s, "samples/piano3.wav");
-    ~breakpoints = [0,70716, 148109, 334383, 522706, 729012, 839790, 1021891, 1226148, 1456809, 1891424] ; //slightly off as i modified sample
+    ~breakpoints = [0,338154,587473, 1102323,1373365,1785763,2177412,2512000,2731168, 3134488,3405530,3572824];
+    //~breakpoints = [327635,440035,617005,786802,988883,1375109,2152345,2448890,2798048];
 )
 
 (
@@ -54,16 +39,13 @@ SynthDef.new(\RingMod, {
 )*/
 
 x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1, \out, 0]);
-//y = Synth.after(x, \RingMod, [\in, 11]);
+y = Synth.new(\bufPlay, [\buf, ~buf2, \rate, 1, \out, 2]);
 //TODO: modify a? range lo-high increases with duration of song...
-a = Pwhite.new(0.4,0.9,  length: inf).asStream;
-a = Pslide.new([1.2,1.0,0.8], repeats: 3, len: 10, step: 0.1)
-a = Pwrand.new([0.79,1,0.62,1.59,1.27], [0.2,0.3,0.2,0.1,0.2], inf).asStream;//discrete steps (key change!!)
-b = Pstepper.new(size:(size(~breakpoints)-1), repeats: inf).asStream;
-b.next;
-b.reset;
-a = Pgauss.new(mean: 1,  dev: 0.25,  length: inf).asStream;
-a.next
+a = Pwhite.new(0.5,1.1,inf).asStream;
+//a = Pbrown.new(0.5,1.1,0.05,length: inf).asStream;
+//a = Pwrand.new([0.79,1,0.62,1.59,1.27], [0.2,0.3,0.2,0.1,0.2], inf).asStream;//discrete steps (key change!!)
+//b = Pstepper.new(size:(size(~breakpoints)-1), repeats: inf).asStream;
+b = Prand.new([0,1,2,3,4,5,6,7,8,9,10], inf).asStream;
 
 (
 r = Routine.new({
@@ -73,19 +55,15 @@ r = Routine.new({
         index = b.next ? (size(~breakpoints)-2);
         dur = (1/speed)*(~breakpoints[index+1] - ~breakpoints[index])/48000;
         x.set(\buf, ~buf, \rate, speed, \start, ~breakpoints[index], \t_trig, 1);
+        y.set(\rate, speed);
         dur.yield;
     }   
 });
 )
-b.postln;
 
 r.play;
 r.stop;
 
 s.boot
 s.meter;
-
-b = Pstepper.new(length:5).asStream;
-b.next
-b.reset
 
