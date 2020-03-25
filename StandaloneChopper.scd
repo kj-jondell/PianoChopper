@@ -7,6 +7,7 @@ TODO: - Play using Disklavier (later version)
 - Icecast from home server
 - control with some other data input?
 - restructure old ocde and cleaning
+- Add FX? Delay..NHHall..
 **/
 
 s.options.device = "Soundflower (64ch)";
