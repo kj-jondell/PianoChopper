@@ -6,6 +6,7 @@ TODO: - Play using Disklavier (later version)
 - Remove unused samples...
 - Icecast from home server
 - control with some other data input?
+- restructure old ocde and cleaning
 **/
 
 s.options.device = "Soundflower (64ch)";
