@@ -5,7 +5,6 @@ TODO: - Add sample breakpoints
 - Play using Disklavier (later version)
 - Osc communication between Live and Sc
 - Complete Pstepper
-- ugen?
 */
 
 s.boot;
