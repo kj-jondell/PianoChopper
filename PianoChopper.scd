@@ -17,12 +17,12 @@ s.options.device = "Soundflower (64ch)"
 )
 
 (
-SynthDef.new(\bufPlay, {
-    arg buf, rate, t_trig, lag = 0.01, start = 0, out = 0;
-	var sig, envsig;
-	sig = PlayBufCF.ar(2, buf, BufRateScale.kr(buf)*rate, t_trig, start, lag: lag); //PlayBufCF for crossfading when jumping in buffer
-	Out.ar(out, sig);
-}).add;
+    SynthDef.new(\bufPlay, {
+        arg buf, rate, t_trig, lag = 0.01, start = 0, out = 0;
+        var sig, envsig;
+        sig = PlayBufCF.ar(2, buf, BufRateScale.kr(buf)*rate, t_trig, start, lag: lag); //PlayBufCF for crossfading when jumping in buffer
+        Out.ar(out, sig);
+    }).add;
 )
 
 x = Synth.new(\bufPlay, [\buf, ~buf, \rate, 1, \out, 0]);
@@ -35,16 +35,16 @@ b = Pstepper.new(size:(size(~breakpoints)-1), repeats: inf).asStream;
 //b = Prand.new([0,1,2,3,4,5,6,7,8,9,10], inf).asStream;
 
 (
-r = Routine.new({
-    loop{
-        var dur, speed, index;
-        speed = a.next;
-        index = b.next ? (size(~breakpoints)-2);
-        dur = (1/speed)*(~breakpoints[index+1] - ~breakpoints[index])/48000;
-        x.set(\buf, ~buf, \rate, speed, \start, ~breakpoints[index], \t_trig, 1);
-        dur.yield;
-    }   
-});
+    r = Routine.new({
+        loop{
+            var dur, speed, index;
+            speed = a.next;
+            index = b.next ? (size(~breakpoints)-2);
+            dur = (1/speed)*(~breakpoints[index+1] - ~breakpoints[index])/48000;
+            x.set(\buf, ~buf, \rate, speed, \start, ~breakpoints[index], \t_trig, 1);
+            dur.yield;
+        }   
+    });
 )
 
 r.play;
