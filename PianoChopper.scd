@@ -1,9 +1,10 @@
 /**
 Program for chopping up piano
 TODO: - Add sample breakpoints
-- Through Soundflower (OR vinyl hang-up in ableton)
+- Vinyl hang-up in ableton
 - Play using Disklavier (later version)
 - Osc communication between Live and Sc
+- Complete Pstepper
 */
 
 s.boot;

@@ -2,9 +2,10 @@
 Program for chopping up piano
 TODO: - Play using Disklavier (later version)
 - Osc communication between Live and Sc
+- Control using Nanokontrol....
 */
 
-s.boot;
+s.reboot;
 s.quit;
 s.options.device = "Soundflower (64ch)"
 s.options.device = "Built-In Output";
@@ -68,21 +69,22 @@ b = StepCounter([~buf_high.size, ~buf_low.size]);
     [b.currentLevel,b.currentStep,b.speed]
 )
 b.currentLevel = 1
-~scaler = 0.9;
+~scaler = 1.0;
 (
-    ~probScale = 1;
+    ~probScale = 1000;
     b.speedProbability = Array.fill(6,{|i|(1/6)**(i/~probScale);}).normalizeSum(); 
 )
 b.speedProbability = Array.fill(6,{1/6}).normalizeSum(); 
 b.speedProbability = [0,0,0,0,0,1];
+(
+    b.incrementor = {1+20.rand}
+    //b.currentLevel = 2.rand;
+    b.currentLevel = [0,1].wchoose([1,1].normalizeSum());
+    b.repeat = true;
+    b.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();
+)
 
-//b.incrementor = {1+4.rand}
-//b.currentLevel = 2.rand;
-b.currentLevel = [0,1].wchoose([1,1].normalizeSum());
-b.currentStep = 0
-b.repeat = true;
-b.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();
-
+s.meter;
 r.play;
 r.stop;
 
