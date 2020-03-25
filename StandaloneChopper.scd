@@ -8,51 +8,87 @@ TODO: - Play using Disklavier (later version)
 
 s.options.device = "Soundflower (64ch)";
 
-s.waitForBoot({
-    var buffers_low, buffers_high;
-    var stepper; //= StepCounter.new([1,1]);
-    
-    //Sorting low and high buffers, outputing an array with longest first
-    var sortArrayByDuration = {
-        arg array;
-        var sorted_hi = List();
+(
+    s.waitForBoot({
+        var buffers_low, buffers_high;
+        var stepper; //= StepCounter.new([1,1]);
 
-        array.do({
-            arg buf, i; 
-            if(sorted_hi.size == 0, {sorted_hi.add(buf);},
-            {
-                var inserted = false, index = 0;
-                while({inserted == false})
-                {
-                    if(buf.duration<sorted_hi[index].duration)
-                    {
-                        sorted_hi = sorted_hi.insert(index,buf); 
-                        inserted = true;
-                    }; 
-                    index = index + 1;
-                    if(index == sorted_hi.size)
-                    {
-                        sorted_hi.add(buf);
-                        inserted = true;
-                    };
-                }
-            });
+        var runner = Routine.new({
+            loop{
+                var speed, index, range, buffer, sleeptime;
+                stepper.next;
+                speed = stepper.speed;
+                index = stepper.currentStep;
+                range = stepper.currentLevel;
+                //should possibly be other way around? 0->low 1->high
+                buffer = switch(range,
+                    0, {buffers_high},
+                    1, {buffers_low}
+                );
+                x = Synth(\bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed]);
+
+                sleeptime = (buffer[index].duration-0.05)/speed;
+                sleeptime = ~scaler.linlin(0,1,1,sleeptime);
+                sleeptime.yield;
+
+            }
         });
 
-        array = sorted_hi.reverse;//longest first
-        array;
-    };
+        //Sorting low and high buffers, outputing an array with longest first 
+        var sortArrayByDuration = {
+            arg array, longest_first = true;
+            var sorted_hi = List();
 
-    buffers_low = (SoundFile.collectIntoBuffers("/Users/kj/Documents/school/KMH/åk2/ht/eam\ b/supercollider/samples/samples/low/*"));
-    buffers_high = (SoundFile.collectIntoBuffers("/Users/kj/Documents/school/KMH/åk2/ht/eam\ b/supercollider/samples/samples/high/*"));
+            array.do({
+                arg buf, i; 
+                if(sorted_hi.size == 0, {sorted_hi.add(buf);},
+                {
+                    var inserted = false, index = 0;
+                    while({inserted == false})
+                    {
+                        if(buf.duration<sorted_hi[index].duration)
+                        {
+                            sorted_hi = sorted_hi.insert(index,buf); 
+                            inserted = true;
+                        }; 
+                        index = index + 1;
+                        if(index == sorted_hi.size)
+                        {
+                            sorted_hi.add(buf);
+                            inserted = true;
+                        };
+                    }
+                });
+            });
 
-    s.sync; //wait for buffers..
+            if(longest_first)
+            {
+                array = sorted_hi.reverse;//longest first
+            };
+            array;
+        };
 
-    sortArrayByDuration.value(buffers_low).postln;
+        SynthDef.new(\bufPlaySeparate, {
+            arg buf, rate = 1, duration = 1;
+            var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate, doneAction: Done.freeSelf);
+            var env = EnvGen.ar(Env.new([0,1,1,0], [0.1,(duration/rate)-0.1,0.1], [-0.5,0,0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
+            Out.ar(0, sig*env);
+        }).add;
 
-    //s.quit;//quit server
-    //0.exit;//quit sclang
-});
+        buffers_low = (SoundFile.collectIntoBuffers("/Users/kj/Documents/school/KMH/åk2/ht/eam\ b/supercollider/samples/samples/low/*"));
+        buffers_high = (SoundFile.collectIntoBuffers("/Users/kj/Documents/school/KMH/åk2/ht/eam\ b/supercollider/samples/samples/high/*"));
+
+        s.sync; //wait for buffers..
+
+        buffers_low = sortArrayByDuration.value(buffers_low, true);
+        buffers_high = sortArrayByDuration.value(buffers_high, true);
+
+        stepper = StepCounter([buffers_high.size, buffers_low.size]);
+
+        //s.quit;//quit server
+        //0.exit;//quit sclang
+    });
+)
 
 /*
 s.boot;
