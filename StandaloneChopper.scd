@@ -8,6 +8,7 @@ TODO: - Play using Disklavier (later version)
 - control with some other data input?
 - restructure old ocde and cleaning
 - Add FX? Delay..NHHall..
+- scenes... time stretch (WarpZ or something...)
 **/
 
 (
@@ -15,7 +16,7 @@ TODO: - Play using Disklavier (later version)
 
     s.waitForBoot({
         var buffers_low, buffers_high;
-        var stepper; //= StepCounter.new([1,1]);
+        var stepper; 
         var scaler = 1.0;
         var currentBuffer, decayReverbSynth;
         var decayReverbBus = Bus.audio(s,2);
