@@ -110,7 +110,7 @@ TODO: - Play using Disklavier (later version)
         stepper.currentLevel = [0,1].wchoose([1,1].normalizeSum());//temporary testing variables
         stepper.repeat = true;//temporary testing variables
         stepper.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();//temporary testing variables
-        scaler = 1.0;
+        scaler = 0.7;
 
         decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index]);
 
@@ -120,15 +120,18 @@ TODO: - Play using Disklavier (later version)
 )
 
 (
-SynthDef.new(\modulatedNoise, {
-    arg mul = 0.005;
-    var pink = PinkNoise.ar(), grey = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul:0.5);
-    var left = XFade2.ar(XFade2.ar(pink, grey, SinOsc.kr(0.03, phase:2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase:2pi.rand)), SinOsc.kr(0.05, phase:2pi.rand, mul:0.75));
-    var right = XFade2.ar(XFade2.ar(white, grey, SinOsc.kr(0.09, phase:2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase:2pi.rand)), SinOsc.kr(0.01, phase:2pi.rand, mul:0.75));
-    left = XFade2.ar(left,CombC.ar(left, maxdelaytime:3, decaytime:1));
-    right = XFade2.ar(right,CombC.ar(right, decaytime:1, maxdelaytime:3));
-    Out.ar(0,mul*[left,right]);
-}).add;
+    //TODO - add arguments...
+    // - equal loudness... interpolation in 2d..
+    // - patch this through fx bus...
+    SynthDef.new(\modulatedNoise, {
+        arg mul = 0.005;
+        var pink = PinkNoise.ar(), brown = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul:0.5);
+        var left = XFade2.ar(XFade2.ar(pink, brown, SinOsc.kr(0.03, phase:2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase:2pi.rand)), SinOsc.kr(0.05, phase:2pi.rand, mul:0.75));
+        var right = XFade2.ar(XFade2.ar(white, brown, SinOsc.kr(0.09, phase:2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase:2pi.rand)), SinOsc.kr(0.01, phase:2pi.rand, mul:0.75));
+        left = XFade2.ar(left,CombC.ar(left, maxdelaytime:3, decaytime:1));
+        right = XFade2.ar(right,CombC.ar(right, decaytime:1, maxdelaytime:3));
+        Out.ar(0,mul*[left,right]);
+    }).add;
 )
 x.free
 x = Synth(\modulatedNoise);
