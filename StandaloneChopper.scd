@@ -11,9 +11,7 @@ TODO: - Play using Disklavier (later version)
 - scenes... time stretch (WarpZ or something...)
 **/
 
-
 (
-    s.options.device = "Scarlett 8i6 USB";
 
     s.waitForBoot({
         var buffers_low, buffers_high;
@@ -79,7 +77,7 @@ TODO: - Play using Disklavier (later version)
 
         SynthDef.new(\bufPlaySeparate, {
             arg buf, rate = 1, duration = 1, outBus = 0, effectBus = 2;
-            var sig = PlayBufCF.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.001)/*, doneAction: Done.freeSelf*/);
+            var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.001)/*, doneAction: Done.freeSelf*/); //PlayBufCF!!! TODO install this...
             var env = EnvGen.ar(Env.new([0,1,1,0], [0.1,(duration/rate)-0.1,0.1], [-0.5,0,0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
             var mixed = sig*env;
             Out.ar(effectBus, mixed);
@@ -97,8 +95,8 @@ TODO: - Play using Disklavier (later version)
             Out.ar(outBus, pitch);
         }).add;
 
-        buffers_low = (SoundFile.collectIntoBuffers("/Users/kj/Documents/school/supercollider/projects/simple-radio/chopper/samples/low/*"));
-        buffers_high = (SoundFile.collectIntoBuffers("/Users/kj/Documents/school/supercollider/projects/simple-radio/chopper/samples/high/*"));
+        buffers_low = (SoundFile.collectIntoBuffers("/home/kj/Documents/projects/simple-radio/samples/low/*"));
+        buffers_high = (SoundFile.collectIntoBuffers("/home/kj/Documents/projects/simple-radio/samples/high/*"));
 
         s.sync; //wait for buffers..
 
@@ -120,51 +118,51 @@ TODO: - Play using Disklavier (later version)
 
     });
 )
-
-(
-    //TODO - add arguments...
-    // - equal loudness... interpolation in 2d..
-    // - patch this through fx bus...
-    SynthDef.new(\modulatedNoise, {
-        arg mul = 0.005;
-        var pink = PinkNoise.ar(), brown = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul:0.5), gray = GrayNoise.ar();
-        var left = XFade2.ar(XFade2.ar(pink, brown, SinOsc.kr(0.03, phase:2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase:2pi.rand)), SinOsc.kr(0.05, phase:2pi.rand, mul:0.75));
-        var right = XFade2.ar(XFade2.ar(white, brown, SinOsc.kr(0.09, phase:2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase:2pi.rand)), SinOsc.kr(0.01, phase:2pi.rand, mul:0.75));
-        left = XFade2.ar(left,CombC.ar(left, maxdelaytime:3, decaytime:1));
-        right = XFade2.ar(right,CombC.ar(right, decaytime:1, maxdelaytime:3));
-        Out.ar(0,mul*[left,right]);
-    }).add;
-)
-x.free
-x = Synth(\modulatedNoise);
-{[ClipNoise.ar(0.01)]!2}.play;
-
-
-
-SynthDef.new(\timeStretch, {
-    arg bufnum=0, duration = 30,stretch=1;
-    var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Sweep.kr(Impulse.kr(1/(duration*stretch)),1/(duration*stretch)).unipolar,  freqScale:1,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: 1,  add: 0);
-    //var in= PlayBuf.ar(2,bufnum,loop:1);
-    //var sig = GrainBuf.ar(2, Impulse.ar(1), dur:0.1,sndbuf:bufnum, pos:Sweep.kr(Impulse.kr(1/duration),1/duration));
-    //var sig= WarpOverlap.ar(2,  buffer: bufnum,  overlaps: 16,  starttime: 0,  stretch: 1,  harm: 1,  windowsize: 6,  step: 1,  warpwindowsize: 0.11,  warpwindowoverlaps: 8,  warpwindowran: 0.1,  mul: 1,  add: 0);
-    //var sig = BufGrain.ar(Impulse.kr(10), dur:0.8, sndbuf:bufnum, rate:1, pos:Sweep.kr(Impulse.kr(1/(duration*2)),1/(duration*2)).unipolar, interp:4);
-   // var sig = BufGrain.ar(Impulse.kr(10), 0.2, bufnum, MouseX.kr(0.5, 8), PinkNoise.kr.range(0, 1), 2);
-    Out.ar(0,sig);
-}).add;
-)
-(
-    var buffer = ~buffers_low.choose;
-    x.set(\bufnum,buffer);
-    x.set(\duration,buffer.duration);
-    //x.set(\stretch,1.0.rand+0.85);
-    x.set(\stretch,6.0.rand.range(1.8,6))
-)
-TGrains2
-(
-    var buffer = ~buffers_low.choose;
-    x=Synth(\timeStretch, [\bufnum, buffer, \duration, buffer.duration]);
-)
-(
+//
+//(
+//    //TODO - add arguments...
+//    // - equal loudness... interpolation in 2d..
+//    // - patch this through fx bus...
+//    SynthDef.new(\modulatedNoise, {
+//        arg mul = 0.005;
+//        var pink = PinkNoise.ar(), brown = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul:0.5), gray = GrayNoise.ar();
+//        var left = XFade2.ar(XFade2.ar(pink, brown, SinOsc.kr(0.03, phase:2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase:2pi.rand)), SinOsc.kr(0.05, phase:2pi.rand, mul:0.75));
+//        var right = XFade2.ar(XFade2.ar(white, brown, SinOsc.kr(0.09, phase:2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase:2pi.rand)), SinOsc.kr(0.01, phase:2pi.rand, mul:0.75));
+//        left = XFade2.ar(left,CombC.ar(left, maxdelaytime:3, decaytime:1));
+//        right = XFade2.ar(right,CombC.ar(right, decaytime:1, maxdelaytime:3));
+//        Out.ar(0,mul*[left,right]);
+//    }).add;
+//)
+//x.free
+//x = Synth(\modulatedNoise);
+//{[ClipNoise.ar(0.01)]!2}.play;
+//
+//
+//
+//SynthDef.new(\timeStretch, {
+//    arg bufnum=0, duration = 30,stretch=1;
+//    var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Sweep.kr(Impulse.kr(1/(duration*stretch)),1/(duration*stretch)).unipolar,  freqScale:1,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: 1,  add: 0);
+//    //var in= PlayBuf.ar(2,bufnum,loop:1);
+//    //var sig = GrainBuf.ar(2, Impulse.ar(1), dur:0.1,sndbuf:bufnum, pos:Sweep.kr(Impulse.kr(1/duration),1/duration));
+//    //var sig= WarpOverlap.ar(2,  buffer: bufnum,  overlaps: 16,  starttime: 0,  stretch: 1,  harm: 1,  windowsize: 6,  step: 1,  warpwindowsize: 0.11,  warpwindowoverlaps: 8,  warpwindowran: 0.1,  mul: 1,  add: 0);
+//    //var sig = BufGrain.ar(Impulse.kr(10), dur:0.8, sndbuf:bufnum, rate:1, pos:Sweep.kr(Impulse.kr(1/(duration*2)),1/(duration*2)).unipolar, interp:4);
+//   // var sig = BufGrain.ar(Impulse.kr(10), 0.2, bufnum, MouseX.kr(0.5, 8), PinkNoise.kr.range(0, 1), 2);
+//    Out.ar(0,sig);
+//}).add;
+//)
+//(
+//    var buffer = ~buffers_low.choose;
+//    x.set(\bufnum,buffer);
+//    x.set(\duration,buffer.duration);
+//    //x.set(\stretch,1.0.rand+0.85);
+//    x.set(\stretch,6.0.rand.range(1.8,6))
+//)
+//TGrains2
+//(
+//    var buffer = ~buffers_low.choose;
+//    x=Synth(\timeStretch, [\bufnum, buffer, \duration, buffer.duration]);
+//)
+//(
 
 //s.queryAllNodes
 //s.quit;//quit server
