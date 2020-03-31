@@ -11,8 +11,9 @@ TODO: - Play using Disklavier (later version)
 - scenes... time stretch (WarpZ or something...)
 **/
 
+
 (
-    s.options.device = "DELL U2415";
+    s.options.device = "Scarlett 8i6 USB";
 
     s.waitForBoot({
         var buffers_low, buffers_high;
