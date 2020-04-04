@@ -12,7 +12,7 @@ TODO: - Play using Disklavier (later version)
 **/
 
 (
-    s = Server(\myServer, NetAddr("localhost", 58009)); //non-standard port
+    s.addr = NetAddr("localhost", 58009); //non-standard port
     s.waitForBoot({
         var buffers_low, buffers_high;
         var stepper; 
