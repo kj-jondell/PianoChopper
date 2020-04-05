@@ -117,10 +117,10 @@ TODO: - Play using Disklavier (later version)
         //Dry wet ranges between -1 and 1
         //TODO: Order of effects?
         SynthDef.new(\delayReverbPitch, {
-            arg inBus = 2, outBus = 0, delayTime = 0.2, decayTime = 1.0, dryWetReverb = -0.5, dryWetDelay = -0.15, dryWetPitch = 0.0;
+            arg inBus = 2, outBus = 0, delayTime = 0.2, rvDecay = 2.0, decayTime = 1.0, dryWetReverb = -0.15, dryWetDelay = -0.15, dryWetPitch = 0.0;
             var dry = In.ar(inBus, 2);
             var delay = XFade2.ar(dry, CombC.ar(dry, delaytime:delayTime*Line.kr(1.0,1.2,5), decaytime:decayTime, maxdelaytime:5), dryWetDelay);
-            var reverb = XFade2.ar(delay, NHHall.ar(delay,  rt60: decayTime,  stereo: 0.5,  lowFreq: 200,  lowRatio: 0.5,  hiFreq: 2000,  hiRatio: 0.3,  earlyDiffusion: 0.5,  lateDiffusion: 0.9,  modRate: 0.2,  modDepth: 0.3), dryWetReverb);
+            var reverb = XFade2.ar(delay, NHHall.ar(delay,  rt60: rvDecay,  stereo: 0.5,  lowFreq: 200,  lowRatio: 0.5,  hiFreq: 2000,  hiRatio: 0.3,  earlyDiffusion: 0.5,  lateDiffusion: 0.9,  modRate: 0.2,  modDepth: 0.3), dryWetReverb);
             var pitch = XFade2.ar(reverb, PitchShift.ar(reverb,  windowSize: 0.2, pitchRatio:0.25,  pitchDispersion: 0.0), dryWetPitch);
             Out.ar(outBus, pitch);
         }).add;
@@ -143,24 +143,11 @@ TODO: - Play using Disklavier (later version)
         scaler = 0.7;
 
         decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index]);
-        noise = Synth.before(decayReverbSynth, \modulatedNoise);
+        noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.02]);
 
         runner.play;
 
     });
-)
-
-(
-    var buffer = ~buffers_high.choose;
-    x.set(\bufnum,buffer);
-    x.set(\duration,buffer.duration);
-    //x.set(\stretch,1.0.rand+0.85);
-    x.set(\stretch,6.0.rand.range(1.8,6))
-)
-
-(
-    var buffer = ~buffers_low.choose;
-    x=Synth(\timeStretch, [\bufnum, buffer, \duration, buffer.duration]);
 )
 
 s.queryAllNodes
