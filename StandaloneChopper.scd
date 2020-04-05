@@ -19,15 +19,16 @@ TODO: - Play using Disklavier (later version)
         var buffers_low, buffers_high;
         var stepper; 
         var scaler = 1.0;
-        var currentBuffer, decayReverbSynth, noTimeStrech = true;
+        var currentBuffer, decayReverbSynth, noTimeStrech = false;
         var noise;
-        var decayReverbBus = Bus.audio(s,2);
+        var decayReverbBus = Bus.audio(s, 2);
 
         var runner = Routine.new({
             loop{
-                var speed, index, range, buffer, sleeptime;
+                var speed, index, range, buffer, sleeptime, stretch;
                 stepper.next;
                 speed = stepper.speed;
+                stretch = if(noTimeStrech,{1}, {6.0.rand.range(1.8,6)}); //add to stepper (new function to calculate stretch...)
                 index = stepper.currentStep;
                 range = stepper.currentLevel;
                 //should possibly be other way around? 0->low 1->high
@@ -38,10 +39,11 @@ TODO: - Play using Disklavier (later version)
                 if(noTimeStrech){
                     currentBuffer = Synth.before(decayReverbSynth, \bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed, \effectBus, decayReverbBus.index]);
                 } { //else
-                    currentBuffer = Synth.before(decayReverbSynth, \timeStretch, [\bufnum, buffer[index], \duration, buffer[index].duration, \stretch, 6.0.rand.range(1.8,6), \effectBus, decayReverbBus.index]);//TODO change stretch
+                    currentBuffer.set(\mul, 0);
+                    currentBuffer = Synth.before(decayReverbSynth, \timeStretch, [\rate, speed, \bufnum, buffer[index], \duration, buffer[index].duration, \stretch, stretch, \effectBus, decayReverbBus.index]);//TODO change stretch
                 };
 
-                sleeptime = (buffer[index].duration-0.05)/speed;
+                sleeptime = (stretch*buffer[index].duration-0.05)/speed;
                 sleeptime = scaler.linlin(0,1,1,sleeptime);
                 sleeptime.yield;
 
@@ -96,8 +98,10 @@ TODO: - Play using Disklavier (later version)
         }).add;
 
         SynthDef.new(\timeStretch, {
-            arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2;
-            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Sweep.kr(Impulse.kr(1/(duration*stretch)), 1/(duration*stretch)).unipolar,  freqScale:1,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: 1,  add: 0);
+            arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2, mul = 1, rate = 1;
+            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: mul,  add: 0);
+            DetectSilence.ar(sig, doneAction: Done.freeSelf);
+            //Sweep.kr(Impulse.kr(1/(duration*stretch)), 1/(duration*stretch)).unipolar
             Out.ar(effectBus, sig);
         }).add;
 
@@ -159,6 +163,7 @@ TODO: - Play using Disklavier (later version)
     x=Synth(\timeStretch, [\bufnum, buffer, \duration, buffer.duration]);
 )
 
+s.queryAllNodes
 /**
 * some old remainders...
 * [1,2,3].normalizeSum()
