@@ -12,11 +12,13 @@ TODO: - Play using Disklavier (later version)
 - form..
 **/
 
-s.addr = NetAddr("localhost", 58009); //non-standard port
+Server.default.addr = NetAddr("localhost", 58009); //non-standard port
+Server.default.options.device = "scjack:supercollider";
+Server.default.options.numInputBusChannels = 0;
 "SC_JACK_DEFAULT_INPUTS".setenv();
 "SC_JACK_DEFAULT_OUTPUTS".setenv("darkice-piano");
 
-s.waitForBoot({
+Server.default.waitForBoot({
     var buffers_low, buffers_high;
     var stepper; 
     var scaler = 1.0;
