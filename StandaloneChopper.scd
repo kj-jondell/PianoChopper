@@ -100,7 +100,7 @@ s.waitForBoot({
 
     SynthDef.new(\timeStretch, {
         arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2, mul = 1, rate = 1;
-        var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: mul,  add: 0);
+        var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: mul,  add: 0); //freeSelf in Line.kr instead of DetectSilence...
         DetectSilence.ar(sig, doneAction: Done.freeSelf);
         //Sweep.kr(Impulse.kr(1/(duration*stretch)), 1/(duration*stretch)).unipolar
         Out.ar(effectBus, sig);
