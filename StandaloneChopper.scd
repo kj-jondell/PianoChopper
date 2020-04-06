@@ -129,8 +129,8 @@ TODO: - Play using Disklavier (later version)
             Out.ar(outBus, pitch);
         }).add;
 
-        buffers_low = (SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/low/*"));
-        buffers_high = (SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/high/*"));
+        buffers_low = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/low/*");
+        buffers_high = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/high/*");
 
         s.sync; //wait for buffers..
 
