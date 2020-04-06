@@ -1,6 +1,5 @@
 samples/
 .DS_Store
-.darkice.cfg
 .icecast.xml
 howto.txt
 dump.mp3
