@@ -12,9 +12,9 @@ TODO: - Play using Disklavier (later version)
 - form..
 **/
 
+//s.addr = NetAddr("localhost", 58009); //non-standard port
+
 (
-    //s.addr = NetAddr("localhost", 58009); //non-standard port
-    //s.options.numInputBusChannels = 0;
     s.waitForBoot({
         var buffers_low, buffers_high;
         var stepper; 
@@ -28,7 +28,7 @@ TODO: - Play using Disklavier (later version)
                 var speed, index, range, buffer, sleeptime, stretch;
                 stepper.next;
                 speed = stepper.speed;
-                stretch = if(noTimeStrech,{1}, {6.0.rand.range(1.8,6)}); //add to stepper (new function to calculate stretch...)
+                stretch = if(noTimeStrech,{1}, {6.0.rand.clip(1.8,6)}); //add to stepper (new function to calculate stretch...)
                 index = stepper.currentStep;
                 range = stepper.currentLevel;
                 //should possibly be other way around? 0->low 1->high
@@ -150,7 +150,7 @@ TODO: - Play using Disklavier (later version)
     });
 )
 
-s.queryAllNodes
+//s.queryAllNodes
 /**
 * some old remainders...
 * [1,2,3].normalizeSum()
