@@ -43,7 +43,6 @@ TODO: - Play using Disklavier (later version)
                 if(noTimeStrech){
                     currentBuffer = Synth.before(decayReverbSynth, \bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed, \effectBus, decayReverbBus.index]);
                 } { //else
-                    currentBuffer.set(\mul, 0);
                     currentBuffer = Synth.before(decayReverbSynth, \timeStretch, [\rate, speed, \bufnum, buffer[index], \duration, buffer[index].duration, \stretch, stretch, \effectBus, decayReverbBus.index]);//TODO change stretch
                 };
 
@@ -102,17 +101,17 @@ TODO: - Play using Disklavier (later version)
         }).add;
 
         SynthDef.new(\timeStretch, {
-            arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2, mul = 1, rate = 1;
-            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: mul,  add: 0); //freeSelf in Line.kr instead of DetectSilence...
-            DetectSilence.ar(sig, doneAction: Done.freeSelf);
-            //Sweep.kr(Impulse.kr(1/(duration*stretch)), 1/(duration*stretch)).unipolar
-            Out.ar(effectBus, sig);
+            arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2, mul = 1, rate = 1, tailTime = 0.01;
+            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch/rate),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: mul,  add: 0); //freeSelf in Line.kr instead of DetectSilence...
+            var env = EnvGen.ar(Env.new([0, 1, 1, 0], [0.1, (duration*stretch/rate)-0.1, 0.1], [-0.5, 0, 0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
+            var mixed = env*sig;
+            Out.ar(effectBus, mixed);
         }).add;
 
         SynthDef.new(\bufPlaySeparate, {
             arg buf, rate = 1, duration = 1, outBus = 0, effectBus = 2;
-            var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.001)/*, doneAction: Done.freeSelf*/); //PlayBufCF!!! TODO install this...
-            var env = EnvGen.ar(Env.new([0,1,1,0], [0.1,(duration/rate)-0.1,0.1], [-0.5,0,0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
+            var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.001)); //PlayBufCF!!! TODO install this...
+            var env = EnvGen.ar(Env.new([0, 1, 1, 0], [0.1, (duration/rate)-0.1, 0.1], [-0.5, 0, 0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
             var mixed = sig*env;
             Out.ar(effectBus, mixed);
         }).add;
