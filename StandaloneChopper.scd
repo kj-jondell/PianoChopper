@@ -13,6 +13,8 @@ TODO: - Play using Disklavier (later version)
 **/
 
 s.addr = NetAddr("localhost", 58009); //non-standard port
+"SC_JACK_DEFAULT_INPUTS".setenv();
+"SC_JACK_DEFAULT_OUTPUTS".setenv("darkice-piano");
 
 s.waitForBoot({
     var buffers_low, buffers_high;
