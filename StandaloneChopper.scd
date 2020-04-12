@@ -6,6 +6,7 @@ TODO:
 - control with some other data input?
 - scenes... 
 - change envelopes of buffers!
+- change code structure (define helper functions in other .scd file e.g.)
 - form..
 - ≥ stretch : between 60 and 120
 between 1.8 and 6
