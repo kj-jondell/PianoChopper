@@ -92,9 +92,9 @@ TODO: - Play using Disklavier (later version)
         // - patch this through fx bus...
         SynthDef.new(\modulatedNoise, {
             arg mul = 0.005, modRate = 0.005;
-            var pink = PinkNoise.ar(), brown = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul:0.5), gray = GrayNoise.ar();
-            var left = XFade2.ar(XFade2.ar(pink, brown, SinOsc.kr(0.03, phase:2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase:2pi.rand)), SinOsc.kr(0.05, phase:2pi.rand, mul:0.75));
-            var right = XFade2.ar(XFade2.ar(white, brown, SinOsc.kr(0.09, phase:2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase:2pi.rand)), SinOsc.kr(0.01, phase:2pi.rand, mul:0.75));
+            var pink = PinkNoise.ar(), brown = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul: 0.5), gray = GrayNoise.ar();
+            var left = XFade2.ar(XFade2.ar(pink, brown, SinOsc.kr(0.03, phase: 2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase: 2pi.rand)), SinOsc.kr(0.05, phase: 2pi.rand, mul: 0.75));
+            var right = XFade2.ar(XFade2.ar(white, brown, SinOsc.kr(0.09, phase: 2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase: 2pi.rand)), SinOsc.kr(0.01, phase: 2pi.rand, mul: 0.75));
             //left = XFade2.ar(left, CombC.ar(left, maxdelaytime:3, decaytime:1));
             //right = XFade2.ar(right, CombC.ar(right, decaytime:1, maxdelaytime:3));
             Out.ar(0, LFTri.kr(modRate).unipolar(mul)*[left,right]);
@@ -102,7 +102,7 @@ TODO: - Play using Disklavier (later version)
 
         SynthDef.new(\timeStretch, {
             arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2, mul = 1, rate = 1, tailTime = 0.01;
-            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch/rate),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul: mul,  add: 0); //freeSelf in Line.kr instead of DetectSilence...
+            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch/rate),  freqScale: rate,  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul:  mul,  add: 0); //freeSelf in Line.kr instead of DetectSilence...
             var env = EnvGen.ar(Env.new([0, 1, 1, 0], [0.1, (duration*stretch/rate)-0.1, 0.1], [-0.5, 0, 0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
             var mixed = env*sig;
             Out.ar(effectBus, mixed);
