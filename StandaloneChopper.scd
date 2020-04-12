@@ -1,15 +1,15 @@
 /**
 Program for chopping up piano
-TODO: - Play using Disklavier (later version)
-- Osc communication between Live and Sc
-- Control using Nanokontrol....
+TODO: 
 - Remove unused samples...
 - Icecast from home server
 - control with some other data input?
-- restructure old code and cleaning
-- Add FX? Delay..NHHall..
-- scenes... time stretch (WarpZ or something...) 
+- scenes... 
+- change envelopes of buffers!
 - form..
+ - ≥ stretch : between 60 and 120
+               between 1.8 and 6
+               no stretch
 **/
 
 (
@@ -32,7 +32,7 @@ TODO: - Play using Disklavier (later version)
                 var speed, index, range, buffer, sleeptime, stretch;
                 stepper.next;
                 speed = stepper.speed;
-                stretch = if(noTimeStrech,{1}, {102.0.rand.clip(1.8,102)}); //add to stepper (new function to calculate stretch...)
+                stretch = if(noTimeStrech,{1}, {120.0.rand.clip(60, 120)}); //add to stepper (new function to calculate stretch...)
                 index = stepper.currentStep;
                 range = stepper.currentLevel;
                 //should possibly be other way around? 0->low 1->high
@@ -102,7 +102,7 @@ TODO: - Play using Disklavier (later version)
 
         SynthDef.new(\timeStretch, {
             arg bufnum = 0, duration = 30, stretch = 1, effectBus = 2, mul = 1, rate = 1, tailTime = 0.01;
-            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch/rate),  freqScale: BufRateScale.kr(bufnum)*rate*BrownianWalk.kr(0.00005),  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul:  mul,  add: 0); 
+            var sig = Warp1.ar(numChannels: 2,  bufnum: bufnum,  pointer: Line.kr(0, 1, duration*stretch/rate),  freqScale: BufRateScale.kr(bufnum)*rate*BrownianWalk.kr(0.0001),  windowSize: 0.8,  envbufnum: -1,  overlaps: 16,  windowRandRatio: 0.5,  interp: 4,  mul:  mul,  add: 0); 
             var env = EnvGen.ar(Env.new([0, 1, 1, 0], [0.1, (duration*stretch/rate)-0.1, 0.1], [-0.5, 0, 0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
             var mixed = env*sig;
             Out.ar(effectBus, mixed);
@@ -120,7 +120,7 @@ TODO: - Play using Disklavier (later version)
         //Dry wet ranges between -1 and 1
         //TODO: Order of effects?
         SynthDef.new(\delayReverbPitch, {
-            arg inBus = 2, outBus = 0, delayTime = 0.2, rvDecay = 6.0, decayTime = 1.0, dryWetReverb = 0.15, dryWetDelay = -0.15, dryWetPitch = 0.0;
+            arg inBus = 2, outBus = 0, delayTime = 0.2, rvDecay = 26.0, decayTime = 1.0, dryWetReverb = 0.15, dryWetDelay = -0.15, dryWetPitch = 0.0;
             var dry = In.ar(inBus, 2);
 
             var pitch = XFade2.ar(dry, PitchShift.ar(dry,  windowSize: 0.2, pitchRatio:0.5,  pitchDispersion: 0.0), dryWetPitch);
@@ -147,7 +147,7 @@ TODO: - Play using Disklavier (later version)
         //stepper.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();//temporary testing variables
         stepper.speedProbability = [1,0,0,0,0,0];
         scaler = 0.05;
-        ampScaling = 0.5;
+        ampScaling = 0.1;
 
         decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index]);
         noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.02]);
@@ -157,6 +157,7 @@ TODO: - Play using Disklavier (later version)
     });
 )
 
+s.meter
 s.queryAllNodes;
 /**
 * some old remainders...
