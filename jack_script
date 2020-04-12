@@ -1,0 +1,6 @@
+#!/bin/bash
+jackd -R -n scjack -d dummy -C 0 -P 0 -p 256 &
+sudo systemctl start icecast2
+darkice -c ~/Documents/projects/simple-radio/.darkice.cfg &
+sclang ~/Documents/projects/simple-radio/StandaloneChopper.scd &
+
