@@ -1,5 +1,7 @@
 samples/
 .DS_Store
 .icecast.xml
+.darkice.cfg
 howto.txt
+jack_script
 dump.mp3
