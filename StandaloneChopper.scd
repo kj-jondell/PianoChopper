@@ -4,7 +4,7 @@ TODO:
 - Remove unused samples...
 - Icecast from home server
 - control with some other data input?
-- scenes... 
+- scenes... (osc from python..)
 - change envelopes of buffers!
 - form..
  - ≥ stretch : between 60 and 120
@@ -20,7 +20,7 @@ TODO:
     //"SC_JACK_DEFAULT_OUTPUTS".setenv("darkice-piano");
 
     Server.default.waitForBoot({
-        var buffers_low, buffers_high;
+        var buffersLow, buffersHigh;
         var stepper; 
         var scaler = 1.0, ampScaling = 1.0;
         var currentBuffer, decayReverbSynth, noTimeStretch = false;
@@ -29,20 +29,20 @@ TODO:
 
         var helperFunctions, helperRoutines;
 
-        // ====================  IMPORT ====================   
+        // ====================  IMPORT ==================== \\
         helperFunctions = Require.new("Functions.scd"); //Helper functions
         helperRoutines = Require.new("Routines.scd"); //Routines
         Require.new("Synths.scd"); //Synth defs
 
-        buffers_low = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/low/*");
-        buffers_high = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/high/*");
+        buffersLow = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/low/*");
+        buffersHigh = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/high/*");
 
         s.sync; //wait for buffers..
 
-        buffers_low = helperFunctions[\sortArrayByDuration].value(buffers_low, true);
-        buffers_high = helperFunctions[\sortArrayByDuration].value(buffers_high, true);
+        buffersLow = helperFunctions[\sortArrayByDuration].value(buffersLow, true);
+        buffersHigh = helperFunctions[\sortArrayByDuration].value(buffersHigh, true);
 
-        stepper = StepCounter([buffers_high.size, buffers_low.size]);
+        stepper = StepCounter([buffersHigh.size, buffersLow.size]);
 
         stepper.incrementor = {1+20.rand};//temporary testing variables
         stepper.currentLevel = 2.rand;//temporary testing variables
@@ -54,16 +54,16 @@ TODO:
         ampScaling = 0.1;
 
         decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index]);
-        noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.02]);
+        noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.02, \outBus, decayReverbBus.index]);
 
-        helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffers_low: buffers_low, buffers_high: buffers_high).play;
+        helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffersLow: buffersLow, buffersHigh: buffersHigh).play; //TODO use global variables?
 
         //runner.play;
 
     });
 )
 
-s.meter
+s.meter;
 s.queryAllNodes;
 /**
 * some old remainders...

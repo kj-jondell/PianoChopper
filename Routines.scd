@@ -3,7 +3,7 @@ var runnerFunc = {
     stepper, 
     scaler = 1.0, 
     noTimeStretch = false,
-    buffers_low, buffers_high,
+    buffersLow, buffersHigh,
     currentBuffer, decayReverbSynth,
     decayReverbBus;
 
@@ -18,8 +18,8 @@ var runnerFunc = {
             range = stepper.currentLevel;
             //should possibly be other way around? 0->low 1->high
             buffer = switch(range,
-                0, {buffers_high},
-                1, {buffers_low}
+                0, {buffersHigh},
+                1, {buffersLow}
             );
             if(noTimeStretch){
                 currentBuffer = Synth.before(decayReverbSynth, \bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed, \effectBus, decayReverbBus.index]);
