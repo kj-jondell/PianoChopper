@@ -23,39 +23,15 @@ TODO:
         var buffers_low, buffers_high;
         var stepper; 
         var scaler = 1.0, ampScaling = 1.0;
-        var currentBuffer, decayReverbSynth, noTimeStrech = false;
-        var noise;
+        var currentBuffer, decayReverbSynth, noTimeStretch = false;
+        var noise, runner;
         var decayReverbBus = Bus.audio(s, 2);
 
-        var sortArrayByDuration;
+        var helperFunctions, helperRoutines;
 
-        var runner = Routine.new({
-            loop{
-                var speed, index, range, buffer, sleeptime, stretch;
-                stepper.next;
-                speed = stepper.speed;
-                stretch = if(noTimeStrech,{1}, {120.0.rand.clip(60, 120)}); //add to stepper (new function to calculate stretch...)
-                index = stepper.currentStep;
-                range = stepper.currentLevel;
-                //should possibly be other way around? 0->low 1->high
-                buffer = switch(range,
-                    0, {buffers_high},
-                    1, {buffers_low}
-                );
-                if(noTimeStrech){
-                    currentBuffer = Synth.before(decayReverbSynth, \bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed, \effectBus, decayReverbBus.index]);
-                } { //else
-                    currentBuffer = Synth.before(decayReverbSynth, \timeStretch, [\rate, speed, \bufnum, buffer[index], \duration, buffer[index].duration, \mul, ampScaling, \stretch, stretch, \effectBus, decayReverbBus.index]);//TODO change stretch
-                };
-
-                sleeptime = (stretch*buffer[index].duration-0.05)/speed;
-                sleeptime = scaler.linlin(0,1,1,sleeptime);
-                sleeptime.yield;
-
-            }
-        });
-
-        sortArrayByDuration = Require.new("Helper.scd"); //Helper functions
+        // ====================  IMPORT ====================   
+        helperFunctions = Require.new("Functions.scd"); //Helper functions
+        helperRoutines = Require.new("Routines.scd"); //Routines
         Require.new("Synths.scd"); //Synth defs
 
         buffers_low = SoundFile.collectIntoBuffers(File.getcwd+/+"/samples/low/*");
@@ -63,8 +39,8 @@ TODO:
 
         s.sync; //wait for buffers..
 
-        buffers_low = sortArrayByDuration.value(buffers_low, true);
-        buffers_high = sortArrayByDuration.value(buffers_high, true);
+        buffers_low = helperFunctions[\sortArrayByDuration].value(buffers_low, true);
+        buffers_high = helperFunctions[\sortArrayByDuration].value(buffers_high, true);
 
         stepper = StepCounter([buffers_high.size, buffers_low.size]);
 
@@ -80,7 +56,9 @@ TODO:
         decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index]);
         noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.02]);
 
-        runner.play;
+        helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffers_low: buffers_low, buffers_high: buffers_high).play;
+
+        //runner.play;
 
     });
 )

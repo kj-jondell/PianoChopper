@@ -1,3 +1,4 @@
+var returnDict = ();
 //Sorting low and high buffers, outputing an array with longest first 
 var sortArrayByDuration = {
     arg array, longest_first = true;
@@ -32,4 +33,5 @@ var sortArrayByDuration = {
     array;
 };
 
-sortArrayByDuration;
+returnDict.add(\sortArrayByDuration -> sortArrayByDuration);
+returnDict;

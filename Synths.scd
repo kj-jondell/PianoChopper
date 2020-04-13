@@ -6,8 +6,7 @@ SynthDef.new(\modulatedNoise, {
     var pink = PinkNoise.ar(), brown = BrownNoise.ar(), white = WhiteNoise.ar(), clip = ClipNoise.ar(mul: 0.5), gray = GrayNoise.ar();
     var left = XFade2.ar(XFade2.ar(pink, brown, SinOsc.kr(0.03, phase: 2pi.rand)), XFade2.ar(white, clip, SinOsc.kr(0.04, phase: 2pi.rand)), SinOsc.kr(0.05, phase: 2pi.rand, mul: 0.75));
     var right = XFade2.ar(XFade2.ar(white, brown, SinOsc.kr(0.09, phase: 2pi.rand)), XFade2.ar(pink, clip, SinOsc.kr(0.07, phase: 2pi.rand)), SinOsc.kr(0.01, phase: 2pi.rand, mul: 0.75));
-    //left = XFade2.ar(left, CombC.ar(left, maxdelaytime:3, decaytime:1));
-    //right = XFade2.ar(right, CombC.ar(right, decaytime:1, maxdelaytime:3));
+
     Out.ar(0, LFTri.kr(modRate).unipolar(mul)*[left,right]);
 }).add;
 
