@@ -84,8 +84,8 @@ Server.default.waitForBoot({
 
 });
 
-s.meter
-s.queryAllNodes;
+//s.meter
+//s.queryAllNodes;
 /**
 * some old remainders...
 * [1,2,3].normalizeSum()
