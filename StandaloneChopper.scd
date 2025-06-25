@@ -23,7 +23,7 @@ TODO:
         var buffersLow, buffersHigh;
         var stepper; 
         var scaler = 1.0, ampScaling = 1.0;
-        var currentBuffer, decayReverbSynth, noTimeStretch = false;
+        var currentBuffer, decayReverbSynth, noTimeStretch = true;
         var noise, runner;
         var decayReverbBus = Bus.audio(s, 2);
 
@@ -45,16 +45,17 @@ TODO:
         stepper = StepCounter([buffersHigh.size, buffersLow.size]);
 
         stepper.incrementor = {1+20.rand};//temporary testing variables
-        stepper.currentLevel = 2.rand;//temporary testing variables
+        //stepper.currentLevel = 2.rand;//temporary testing variables
         stepper.currentLevel = [0,1].wchoose([1,1].normalizeSum());//temporary testing variables
         stepper.repeat = true;//temporary testing variables
-        //stepper.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();//temporary testing variables
-        stepper.speedProbability = [1,0,0,0,0,0];
-        scaler = 0.05;
+        stepper.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();//temporary testing variables
+        //stepper.speedProbability = [1,0,0,0,0,0];
+        //scaler = 3;
+        scaler = 0.9;
         ampScaling = 0.1;
 
-        decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index]);
-        noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.02, \outBus, decayReverbBus.index]);
+        decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index, \dryWetReverb, -0.95, \dryWetDelay, 0.95]);
+        noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.007, \modRate, 0.000001, \outBus, decayReverbBus.index]);
 
         helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffersLow: buffersLow, buffersHigh: buffersHigh).play; //TODO use global variables?
 
@@ -65,6 +66,7 @@ TODO:
 
 s.meter;
 s.queryAllNodes;
+s.freeAll;
 /**
 * some old remainders...
 * [1,2,3].normalizeSum()
@@ -78,5 +80,5 @@ s.queryAllNodes;
         *         val.duration.postln;
         *     })
         * )
-        **/
+			**/
 

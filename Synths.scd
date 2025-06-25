@@ -20,7 +20,7 @@ SynthDef.new(\timeStretch, {
 
 SynthDef.new(\bufPlaySeparate, {
     arg buf, rate = 1, duration = 1, outBus = 0, effectBus = 2;
-    var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.001)); 
+    var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.0003)); 
     var env = EnvGen.ar(Env.new([0, 1, 1, 0], [0.1, (duration/rate)-0.1, 0.1], [-0.5, 0, 0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
     var mixed = sig*env;
     Out.ar(effectBus, mixed);

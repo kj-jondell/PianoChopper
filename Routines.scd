@@ -15,12 +15,15 @@ var runnerFunc = {
             speed = stepper.speed;
             stretch = if(noTimeStretch,{1}, {120.0.rand.clip(60, 120)}); //add to stepper (new function to calculate stretch...)
             index = stepper.currentStep;
-            range = stepper.currentLevel;
+            range =  [0,1].wchoose([1,1].normalizeSum());
+            //range = stepper.currentLevel;
             //should possibly be other way around? 0->low 1->high
             buffer = switch(range,
                 0, {buffersHigh},
                 1, {buffersLow}
             );
+						speed.postln;
+						range.postln;
             if(noTimeStretch){
                 currentBuffer = Synth.before(decayReverbSynth, \bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed, \effectBus, decayReverbBus.index]);
             } { //else
@@ -28,7 +31,8 @@ var runnerFunc = {
             };
 
             sleeptime = (stretch*buffer[index].duration-0.05)/speed;
-            sleeptime = scaler.linlin(0,1,1,sleeptime);
+            sleeptime = scaler.linlin(0,1,1,sleeptime+2.0.rand);
+            //sleeptime = scaler.linlin(0,1,1,sleeptime);
             sleeptime.yield;
 
         }
