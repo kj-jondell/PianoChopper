@@ -55,7 +55,7 @@ TODO:
         ampScaling = 0.1;
 
         decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index, \dryWetReverb, -0.95, \dryWetDelay, 0.95]);
-        noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.007, \modRate, 0.000001, \outBus, decayReverbBus.index]);
+        //noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.007, \modRate, 0.000001, \outBus, decayReverbBus.index]);
 
         helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffersLow: buffersLow, buffersHigh: buffersHigh).play; //TODO use global variables?
 
@@ -67,6 +67,7 @@ TODO:
 s.meter;
 s.queryAllNodes;
 s.freeAll;
+
 /**
 * some old remainders...
 * [1,2,3].normalizeSum()
