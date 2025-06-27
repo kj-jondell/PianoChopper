@@ -29,6 +29,7 @@ TODO:
 
         var helperFunctions, helperRoutines;
 
+				//Quarks.install("Require");
         // ====================  IMPORT ==================== \\
         helperFunctions = Require.new("Functions.scd"); //Helper functions
         helperRoutines = Require.new("Routines.scd"); //Routines
@@ -48,13 +49,15 @@ TODO:
         //stepper.currentLevel = 2.rand;//temporary testing variables
         stepper.currentLevel = [0,1].wchoose([1,1].normalizeSum());//temporary testing variables
         stepper.repeat = true;//temporary testing variables
-        stepper.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();//temporary testing variables
-        //stepper.speedProbability = [1,0,0,0,0,0];
+        //stepper.speedProbability = Array.fill(5,{|i|(5-i)**8;}).normalizeSum();//temporary testing variables
+        //stepper.speedProbability = [1,1,1,1,1];
+        stepper.speedProbability = Array.fill(5, {1/5;}).normalizeSum(); //6 because of speed available choices // default value
+        //stepper.speedProbability = [1,0,0,0,0];
         //scaler = 3;
         scaler = 0.9;
         ampScaling = 0.1;
 
-        decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index, \dryWetReverb, -0.95, \dryWetDelay, 0.95]);
+        decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index, \dryWetReverb, -0.9995, \dryWetDelay, 0.95, \dryWetPitch, -0.85]);
         //noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.007, \modRate, 0.000001, \outBus, decayReverbBus.index]);
 
         helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffersLow: buffersLow, buffersHigh: buffersHigh).play; //TODO use global variables?
@@ -64,9 +67,9 @@ TODO:
     });
 )
 
-s.meter;
-s.queryAllNodes;
-s.freeAll;
+// s.meter;
+// s.queryAllNodes;
+// s.freeAll;
 
 /**
 * some old remainders...

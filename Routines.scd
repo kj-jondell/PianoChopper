@@ -11,11 +11,13 @@ var runnerFunc = {
         loop{
             var speed, index, range, buffer, sleeptime, stretch;
 
+            stepper.currentLevel =  [0,1].wchoose([1,1].normalizeSum());
+
             stepper.next;
             speed = stepper.speed;
             stretch = if(noTimeStretch,{1}, {120.0.rand.clip(60, 120)}); //add to stepper (new function to calculate stretch...)
+
             index = stepper.currentStep;
-            //range =  [0,1].wchoose([1,1].normalizeSum());
             range = stepper.currentLevel;
             //should possibly be other way around? 0->low 1->high
             buffer = switch(range,
