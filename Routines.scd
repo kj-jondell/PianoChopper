@@ -25,9 +25,7 @@ var runnerFunc = {
                 1, {buffersLow}
             );
 
-						speed.postln;
-						range.postln;
-						index.postln;
+						Post << "Speed: " << speed << ", range: " << range << ", index: " << index << Char.nl;
 
             if(noTimeStretch){
                 currentBuffer = Synth.before(decayReverbSynth, \bufPlaySeparate, [\buf, buffer[index], \duration, buffer[index].duration, \rate, speed, \effectBus, decayReverbBus.index]);
