@@ -19,8 +19,8 @@ SynthDef.new(\timeStretch, {
 }).add;
 
 SynthDef.new(\bufPlaySeparate, {
-    arg buf, rate = 1, duration = 1, outBus = 0, effectBus = 2;
-    var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(0.0005)); 
+    arg buf, rate = 1, duration = 1, outBus = 0, effectBus = 2, walk_incr = 0.0005;
+    var sig = PlayBuf.ar(2, buf, BufRateScale.kr(buf)*rate*BrownianWalk.kr(walk_incr)); 
     var env = EnvGen.ar(Env.new([0, 1, 1, 0], [0.1, (duration/rate)-0.1, 0.1], [-0.5, 0, 0.5]), doneAction: Done.freeSelf); //TODO: envelope hardcoded?
     var mixed = sig*env;
     Out.ar(effectBus, mixed);
@@ -30,13 +30,15 @@ SynthDef.new(\bufPlaySeparate, {
 //Dry wet ranges between -1 and 1
 //TODO: Order of effects?
 SynthDef.new(\delayReverbPitch, {
-    arg inBus = 2, outBus = 0, delayTime = 0.2, rvDecay = 26.0, decayTime = 1.0, dryWetReverb = 0.15, dryWetDelay = -0.15, dryWetPitch = 0.0;
+    arg inBus = 2, outBus = 0, delayTime = 0.2, rvDecay = 5.0, decayTime = 1.0, dryWetReverb = 0.15, dryWetDelay = -0.15, dryWetPitch = 0.0, lagTime = 20;
     var dry = In.ar(inBus, 2);
 
-    var pitch = XFade2.ar(dry, PitchShift.ar(dry,  windowSize: 0.2, pitchRatio:0.5,  pitchDispersion: 0.0), dryWetPitch);
-    var delay = XFade2.ar(pitch, CombC.ar(pitch, delaytime:delayTime*Line.kr(1.0,1.2,5), decaytime:decayTime, maxdelaytime:5), dryWetDelay);
-    var reverb = XFade2.ar(delay, NHHall.ar(delay,  rt60: rvDecay,  stereo: 0.5,  lowFreq: 200,  lowRatio: 0.5,  hiFreq: 2000,  hiRatio: 0.3,  earlyDiffusion: 0.5,  lateDiffusion: 0.9,  modRate: 0.2,  modDepth: 0.3), dryWetReverb);
+    var pitch = XFade2.ar(dry, PitchShift.ar(dry,  windowSize: 0.2, pitchRatio:0.5,  pitchDispersion: 0.0), Lag.kr(dryWetPitch, lagTime: lagTime));
+		//*Line.kr(1.0,1.2,5)
+    var delay = XFade2.ar(pitch, CombC.ar(pitch, delaytime:Lag.kr(delayTime, lagTime: lagTime), decaytime: Lag.kr(decayTime, lagTime: lagTime), maxdelaytime:5), Lag.kr(dryWetDelay, lagTime: lagTime));
+    var reverb = XFade2.ar(delay, NHHall.ar(delay,  rt60: Lag.kr(rvDecay, lagTime: lagTime),  stereo: 0.5,  lowFreq: 200,  lowRatio: 0.5,  hiFreq: 2000,  hiRatio: 0.3,  earlyDiffusion: 0.5,  lateDiffusion: 0.9,  modRate: 0.2,  modDepth: 0.3), Lag.kr(dryWetReverb, lagTime: lagTime));
 
+		//dryWetReverb.poll;
     Out.ar(outBus, reverb);
 }).add;
 

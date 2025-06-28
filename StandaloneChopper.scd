@@ -27,7 +27,7 @@ TODO:
         var noise, runner;
         var decayReverbBus = Bus.audio(s, 2);
 
-        var helperFunctions, helperRoutines;
+        var helperFunctions, helperRoutines, oscFunc;
 
 				//Quarks.install("Require");
         // ====================  IMPORT ==================== \\
@@ -48,25 +48,40 @@ TODO:
         stepper.incrementor = {1+20.rand};//temporary testing variables
         //stepper.currentLevel = 2.rand;//temporary testing variables
         stepper.currentLevel = [0,1].wchoose([1,1].normalizeSum());//temporary testing variables
-        stepper.repeat = true;//temporary testing variables
-        //stepper.speedProbability = Array.fill(5,{|i|(5-i)**8;}).normalizeSum();//temporary testing variables
+        //stepper.repeat = true;//temporary testing variables
+        //stepper.speedProbability = Array.fill(6,{|i|(6-i)**8;}).normalizeSum();//temporary testing variables
         //stepper.speedProbability = [1,1,1,1,1];
-        stepper.speedProbability = Array.fill(5, {1/5;}).normalizeSum(); //6 because of speed available choices // default value
+        stepper.speedProbability = Array.fill(6, {1/6;}).normalizeSum(); //6 because of speed available choices // default value
         //stepper.speedProbability = [1,0,0,0,0];
+        //stepper.speedProbability = [0,1,0,1,0,1.5];
+				stepper.next;
         //scaler = 3;
         scaler = 0.9;
         ampScaling = 0.1;
 
-        decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index, \dryWetReverb, -0.9995, \dryWetDelay, 0.95, \dryWetPitch, -0.85]);
+        decayReverbSynth = Synth.new(\delayReverbPitch, [\inBus, decayReverbBus.index, \dryWetReverb, -0.985, \dryWetDelay, 0.95, \dryWetPitch, -0.85]);
         //noise = Synth.before(decayReverbSynth, \modulatedNoise, [\mul, 0.007, \modRate, 0.000001, \outBus, decayReverbBus.index]);
 
-        helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffersLow: buffersLow, buffersHigh: buffersHigh).play; //TODO use global variables?
+
+				oscFunc = {
+						arg msg, time, addr, recvPort;
+						//recvPort.postln;
+						switch(msg[0],
+							'/newData', {
+								decayReverbSynth.set(*JSONlib.convertToSC(msg[1].asString).asPairs);
+							}
+						);
+				};
+
+				thisProcess.addOSCRecvFunc(oscFunc);
+
+        helperRoutines.value(currentBuffer: currentBuffer, decayReverbSynth: decayReverbSynth, decayReverbBus: decayReverbBus, stepper: stepper, scaler: scaler, noTimeStretch: noTimeStretch, ampScaling: ampScaling, buffersLow: buffersLow, buffersHigh: buffersHigh, bufLevelPan: ~pan).play; //TODO use global variables?
 
         //runner.play;
 
     });
 )
-
+~pan=0.2;
 // s.meter;
 // s.queryAllNodes;
 // s.freeAll;
@@ -86,3 +101,4 @@ TODO:
         * )
 			**/
 
+// Quarks.install("https://github.com/musikinformatik/JSONlib.git");
